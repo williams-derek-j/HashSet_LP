@@ -1,7 +1,8 @@
 public class HashSet {
     private int size = 0;
     private final double loadFactor = 0.8;
-    private Integer[] elementData = new Integer[16];
+    private int initialCapacity = 16;
+    private Integer[] elementData = new Integer[initialCapacity];
     private final int probeDistance;
     private final Integer TOMBSTONE = Integer.MIN_VALUE;
 
@@ -10,6 +11,7 @@ public class HashSet {
     }
     public HashSet(int initialCapacity) {
         if (initialCapacity > 0) {
+            this.initialCapacity = initialCapacity;
             elementData = new Integer[initialCapacity];
         } else {
             throw new IllegalArgumentException("Initial capacity must be > 0");
@@ -18,6 +20,7 @@ public class HashSet {
     }
     public HashSet(int initialCapacity, int probeDistance) {
         if (initialCapacity > 0) {
+            this.initialCapacity = initialCapacity;
             elementData = new Integer[initialCapacity];
         } else {
             throw new IllegalArgumentException("Initial capacity must be > 0");
@@ -44,9 +47,9 @@ public class HashSet {
             if (probeDistance > 0) {
                 index = (index + probeDistance) % elementData.length;
             } else {
-                index = index + probeDistance;
-                if (index < 0) {
-                    index = elementData.length + probeDistance;
+                index += probeDistance;
+                while (index < 0) {
+                    index += elementData.length;
                 }
             }
             counter--;
@@ -74,7 +77,7 @@ public class HashSet {
             boolean successful = add(toAdd, true);
 
             if (!successful) {
-                elementData = new Integer[0]; // clear data
+                elementData = new Integer[initialCapacity]; // clear data
                 return false;
             }
         }
@@ -103,9 +106,9 @@ public class HashSet {
             if (probeDistance > 0) {
                 index = (index + probeDistance) % elementData.length;
             } else {
-                index = index + probeDistance;
-                if (index < 0) {
-                    index = elementData.length + probeDistance;
+                index += probeDistance;
+                while (index < 0) {
+                    index += elementData.length;
                 }
             }
             counter--;
@@ -125,16 +128,6 @@ public class HashSet {
             elementData[index] = TOMBSTONE;
             size--;
             return true;
-        }
-    }
-
-    public Integer getValue(int value) {
-        int index = contains(value);
-
-        if (index >= 0) {
-            return elementData[index];
-        } else {
-            return null;
         }
     }
 
